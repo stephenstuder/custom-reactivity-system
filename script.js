@@ -3,7 +3,7 @@
 ***********************************************/
 
 // The Problem...
-// JavaScript is declarative, not reactive
+// JavaScript is procedural, not reactive
 let price = 5;
 let quantity = 2;
 let total = price * quantity; //10 right?
