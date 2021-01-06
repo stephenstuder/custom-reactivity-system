@@ -19,17 +19,21 @@ class Dep {
 }
 
 const dep = new Dep();
-
 let price = 5;
 let quantity = 2;
 let total = 0;
-let target = () => {
-    total = price * quantity;
-};
-dep.depend(); //Add this target to the subscribers
-target(); //Run it to get our total
 
-console.log(total); //10.. correct
+function watcher(myFunc) {
+    target = myFunc; // Set as the active target
+    dep.depend(); // Add the active target as a dependency
+    target(); // Call the target
+    target = null; // Reset the target
+}
+
+watcher(() => {
+    total = price * quantity;
+});
+
 price = 20;
 console.log(total); //10.. no longer correct
 dep.notify(); //Run the subscribers
