@@ -1,6 +1,10 @@
 /*********************************************** 
  UNDERSTANDING AND BUILDING A REACTIVITY SYSTEM
 ***********************************************/
+
+let data = { price: 5, quantity: 2 };
+let target = null;
+
 class Dep {
     constructor() {
         this.subscribers = []; // The targets are dependent, and should be
@@ -18,23 +22,36 @@ class Dep {
     }
 }
 
-const dep = new Dep();
-let price = 5;
-let quantity = 2;
-let total = 0;
+Object.keys(data).forEach((key) => {
+    let internalValue = data[key];
+    const dep = new Dep();
 
+    Object.defineProperty(data, key, {
+        get() {
+            dep.depend();
+            return internalValue;
+        },
+        set(newVal) {
+            internalValue = newVal;
+            dep.notify();
+        }
+    });
+});
+
+// This watcher no longer calls dep.depend
+// since that gets called from inside the method.
 function watcher(myFunc) {
-    target = myFunc; // Set as the active target
-    dep.depend(); // Add the active target as a dependency
-    target(); // Call the target
-    target = null; // Reset the target
+    target = myFunc;
+    target();
+    target = null;
 }
 
 watcher(() => {
-    total = price * quantity;
+    data.total = data.price * data.quantity;
 });
 
-price = 20;
-console.log(total); //10.. no longer correct
-dep.notify(); //Run the subscribers
-console.log(total); //40.. now the correct number
+console.log(data.total);
+console.log((data.price = 20));
+console.log(data.total);
+console.log((data.quantity = 3));
+console.log(data.total);
