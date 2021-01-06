@@ -5,10 +5,10 @@
 let data = { price: 5, quantity: 2 };
 let target = null;
 
-// No changes to this dependancy class
 class Dep {
     constructor() {
-        this.subscribers = [];
+        this.subscribers = []; // The targets are dependent, and should be
+        // run when notify() is called.
     }
     depend() {
         if (target && !this.subscribers.includes(target)) {
@@ -22,21 +22,18 @@ class Dep {
     }
 }
 
-// Go through each of our data properties
 Object.keys(data).forEach((key) => {
     let internalValue = data[key];
-
-    // Each property get its own dependancy instance
     const dep = new Dep();
 
     Object.defineProperty(data, key, {
         get() {
-            dep.depend(); // <-- Remember, this is the target we are running
+            dep.depend();
             return internalValue;
         },
         set(newVal) {
             internalValue = newVal;
-            dep.notify(); // <-- Re-run stored functions
+            dep.notify();
         }
     });
 });
